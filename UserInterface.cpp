@@ -2,73 +2,23 @@
 #include <stdexcept>
 #include <string>
 #include "Database.hpp"
+#include "UserInterface.hpp"
 
 using namespace std;
 using namespace Records;
 
-int displayMenu();
-void doAdd(Database &inDB);
-void doListDuties(Database &inDB);
-void doListRequirements(Database &inDB);
-void doFine(Database &inDB);
-void doPromote(Database &inDB);
 
 
-int main(int argc, char **argv)
+UserInterface::UserInterface(Records::Database* targetDB) : inDB(targetDB)
 {
-    Database employeeDB;
-    bool done = false;
-    while (!done)
-    {
-        int selection = displayMenu();
-        switch (selection)
-        {
-        case 1:
-            doAdd(employeeDB);
-            break;
-        case 2:
-            doFine(employeeDB);
-            break;
-        case 3:
-            doPromote(employeeDB);
-            break;
-        case 4:
-            employeeDB.displayAll();
-            break;
-        case 5:
-            doListDuties(employeeDB);
-            break;
-        case 6:
-            doListRequirements(employeeDB);
-            break;
-        case 0:
-            done = true;
-            break;
-        default:
-            cerr << "Unknown command." << endl;
-        }
-    }
 }
-int displayMenu()
-{
-    int selection;
-    cout << endl;
-    cout << "Roles Database" << endl;
-    cout << "-----------------" << endl;
-    cout << "1) Add a new role" << endl;
-    cout << "2) Decrease the role wage" << endl;
-    cout << "3) Increase the role wage" << endl;
-    cout << "4) List all roles" << endl;
-    cout << "5) List all duties of the role" << endl;
-    cout << "6) List all requirements of the role" << endl;
-    cout << "0) Quit" << endl;
-    cout << endl;
 
-    cout << "---> ";
-    cin >> selection;
-    return selection;
+UserInterface::~UserInterface()
+{
 }
-void doAdd(Database &inDB)
+
+
+void UserInterface::doAdd()
 {
     int roleCode;
     string roleName;
@@ -79,9 +29,15 @@ void doAdd(Database &inDB)
     cin >> roleName;
     cout << "Role wage? ";
     cin >> roleWage;
+    
+    if(roleWage < 0)
+    {
+        cerr << "Wage cannot be negative!" << endl;
+        cerr << "Unable to add new role!" << endl;
+    }
     try
     {
-        inDB.addRole(roleCode, roleName, roleWage);
+        inDB->addRole(roleCode, roleName, roleWage);
     }
     catch (std::exception& ex)
     {
@@ -89,14 +45,14 @@ void doAdd(Database &inDB)
     }
 }
 
-void doListDuties(Database &inDB)
+void UserInterface::doListDuties()
 {
     int roleCode;
     cout << "Role code? ";
     cin >> roleCode;
     try
     {
-        const Role &rl = inDB.getRole(roleCode);
+        const Role &rl = inDB->getRole(roleCode);
 
         cout << "Employee's " << roleCode << " duties: " << endl;
         for (const auto& d : rl.getDuties())
@@ -107,14 +63,14 @@ void doListDuties(Database &inDB)
         cerr << "Unable to find employee!" << endl;
     }
 }
-void doListRequirements(Database &inDB)
+void UserInterface::doListRequirements()
 {
     int roleCode;
     cout << "Role code? ";
     cin >> roleCode;
     try
     {
-        const Role &rl = inDB.getRole(roleCode);
+        const Role &rl = inDB->getRole(roleCode);
 
         cout << "Employee's " << roleCode << " requirements: " << endl;
         for (const auto& rq: rl.getRequirements())
@@ -126,7 +82,7 @@ void doListRequirements(Database &inDB)
     }
 }
 
-void doFine(Database &inDB)
+void UserInterface::doFine()
 {
     int roleCode;
     int delta;
@@ -136,7 +92,7 @@ void doFine(Database &inDB)
     cin >> delta;
     try
     {
-        Role &rl = inDB.getRole(roleCode);
+        Role &rl = inDB->getRole(roleCode);
 
         int oldWage = rl.getWage();
         int newWage = oldWage - delta;
@@ -157,7 +113,7 @@ void doFine(Database &inDB)
     }   
 }
 
-void doPromote(Database &inDB)
+void UserInterface::doPromote()
 {
     int roleCode;
     int delta;
@@ -167,7 +123,7 @@ void doPromote(Database &inDB)
     cin >> delta;
     try
     {
-        Role &rl = inDB.getRole(roleCode);
+        Role &rl = inDB->getRole(roleCode);
 
         int oldWage = rl.getWage();
         int newWage = oldWage + delta;

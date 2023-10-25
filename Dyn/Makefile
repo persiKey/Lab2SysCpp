@@ -6,7 +6,7 @@ CXXFLAGS = -Wall -Wextra -pedantic
 TARGET = binary
 
 # Source files
-SRCS = radio.cpp Database.cpp UserInterface.cpp
+SRCS = main.cpp radio.cpp Database.cpp UserInterface.cpp
 
 # Object files
 OBJS = $(SRCS:.cpp=.o)
@@ -15,15 +15,15 @@ OBJS = $(SRCS:.cpp=.o)
 LIBS = lib_dyn_roles.so
 
 # Build the target executable
-$(TARGET): UserInterface.o $(LIBS)
-	$(CXX) -o $@ UserInterface.o -L. $(LIBS) -Wl,--rpath -Wl,.
+$(TARGET): main.o $(LIBS)
+	$(CXX) -o $@ main.o -L. $(LIBS) -Wl,--rpath -Wl,.
 
 # Build object files from source files
 %.o: ../%.cpp
 	$(CXX) -c $< $(CXXFLAGS)
 
 # Build library files from object files
-lib_dyn_roles.so: Database.o radio.o
+lib_dyn_roles.so: Database.o radio.o UserInterface.o
 	ar cr $@ $^
 
 # Clean up by removing object files, library files, and the target executable

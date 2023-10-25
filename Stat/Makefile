@@ -6,7 +6,7 @@ CXXFLAGS = -Wall -Wextra -pedantic
 TARGET = binary
 
 # Source files
-SRCS = radio.cpp Database.cpp UserInterface.cpp
+SRCS = main.cpp radio.cpp Database.cpp UserInterface.cpp
 
 # Object files
 OBJS = $(SRCS:.cpp=.o)
@@ -15,20 +15,21 @@ OBJS = $(SRCS:.cpp=.o)
 LIBS = lib_stat_roles.a
 
 # Build the target executable
-$(TARGET): UserInterface.o $(LIBS)
-	$(CXX) -o $@ UserInterface.o -L. $(LIBS)
+$(TARGET): main.o $(LIBS)
+	$(CXX) -o $@ main.o -L. $(LIBS)
 
 # Build object files from source files
 %.o: ../%.cpp
 	$(CXX) -c $< $(CXXFLAGS)
 
 # Build library files from object files
-lib_stat_roles.a: Database.o radio.o
+lib_stat_roles.a: Database.o radio.o UserInterface.o
 	ar cr $@ $^
 
 # Clean up by removing object files, library files, and the target executable
 clean:
 	rm -f *.o *.a $(TARGET)
+
 
 #binary: radio.o test_lib.a
 #	g++ -o binary radio.o -L. test_lib.a
